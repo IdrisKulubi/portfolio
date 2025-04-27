@@ -4,15 +4,14 @@ import { getProjectBySlug, getRelatedProjects } from "@/lib/projects";
 import { ProjectDetail } from "@/components/sections/projects/project-detail";
 import { RelatedProjects } from "@/components/sections/projects/related-projects";
 
-interface ProjectPageProps {
-  params: {
-    slug: string;
-  };
-}
+// Define the correct type for params according to Next.js 15
+type ProjectPageParams = Promise<{ slug: string }>;
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
-  const project = await getProjectBySlug(params.slug);
+export async function generateMetadata({ params }: { params: ProjectPageParams }): Promise<Metadata> {
+  // Await the params promise
+  const resolvedParams = await params;
+  const project = await getProjectBySlug(resolvedParams.slug);
   
   if (!project) {
     return {
@@ -39,14 +38,16 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
-  const project = await getProjectBySlug(params.slug);
+export default async function ProjectPage({ params }: { params: ProjectPageParams }) {
+  // Await the params promise
+  const resolvedParams = await params;
+  const project = await getProjectBySlug(resolvedParams.slug);
   
   if (!project) {
     notFound();
   }
   
-  const relatedProjects = await getRelatedProjects(params.slug, 3);
+  const relatedProjects = await getRelatedProjects(resolvedParams.slug, 3);
   
   return (
     <main className="flex-1">

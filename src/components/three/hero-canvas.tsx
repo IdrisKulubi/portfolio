@@ -197,6 +197,7 @@ export function HeroCanvas({ setIsLoaded }: HeroCanvasProps) {
       }
       if (rendererRef.current && containerRef.current && rendererRef.current.domElement) {
           try {
+             // eslint-disable-next-line react-hooks/exhaustive-deps
              containerRef.current.removeChild(rendererRef.current.domElement);
           } catch (error) {
               console.warn("Error removing renderer DOM element:", error);

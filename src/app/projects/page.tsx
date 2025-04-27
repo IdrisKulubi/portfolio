@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from 'react';
 import { HeaderPage } from "@/components/layout/header-page";
 import { ProjectsGallery } from "@/components/sections/projects/projects-gallery";
 
@@ -15,8 +16,10 @@ export default async function ProjectsPage() {
         subtitle="A collection of my creative work and design projects"
         color="secondary"
       />
-      <main className="flex-1">
-        <ProjectsGallery />
+      <main className="flex-1 py-12">
+        <Suspense fallback={<div>Loading projects...</div>}>
+          <ProjectsGallery />
+        </Suspense>
       </main>
     </>
   );

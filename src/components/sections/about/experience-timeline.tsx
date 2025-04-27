@@ -4,7 +4,7 @@ import { AnimatedSection } from "@/components/ui/animated-section";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { cn } from "@/lib/utils";
-import { Calendar, Briefcase, GraduationCap, Palette, LucideIcon } from "lucide-react";
+import {  Briefcase, GraduationCap, Palette, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TimelineItem {
