@@ -36,7 +36,7 @@ export function HeroSection() {
       >
         <div className="text-center max-w-3xl mx-auto backdrop-blur-sm bg-black/30 dark:bg-black/50 p-8 rounded-xl shadow-lg">
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">
-            Mugoh
+            Clement
           </h1>
           <p className="text-lg md:text-xl text-white/90 mb-8 max-w-prose mx-auto">
             Creative Graphic Designer & Digital Artist transforming ideas into compelling visual narratives.
