@@ -20,6 +20,23 @@ interface PersonalDetail {
   value: string;
 }
 
+interface BioProps {
+  about: {
+    id: string;
+    bio: string;
+    hero: { headline: string; subheadline?: string; image?: string } | null;
+    skills: string[];
+    experience: Array<{
+      company: string;
+      role: string;
+      start: string;
+      end?: string;
+      description?: string;
+    }> | null;
+    createdAt: Date;
+  } | null;
+}
+
 // Create a custom Behance icon
 const BehanceIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -41,7 +58,34 @@ const BehanceIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export function Bio() {
+export function Bio({ about }: BioProps) {
+  if (!about) {
+    return (
+      <Section className="py-16">
+        <div className="container text-center text-muted-foreground">
+          Bio information is not available.
+        </div>
+      </Section>
+    );
+  }
+
+  // Extract years of experience from the earliest experience entry
+  const getExperienceYears = () => {
+    if (!about.experience || about.experience.length === 0) return "N/A";
+    
+    // Find earliest start date
+    const startDates = about.experience.map(exp => {
+      const year = parseInt(exp.start.split(' ')[1] || exp.start);
+      return isNaN(year) ? new Date().getFullYear() : year;
+    });
+    
+    const earliestYear = Math.min(...startDates);
+    const yearsOfExperience = new Date().getFullYear() - earliestYear;
+    
+    return `${yearsOfExperience}+ Years`;
+  };
+  
+  // Hardcoded social links could be moved to the database schema in the future
   const socialLinks: SocialLink[] = [
     {
       platform: "LinkedIn",
@@ -60,21 +104,22 @@ export function Bio() {
     }
   ];
 
+  // Generate personal details from about data
   const personalDetails: PersonalDetail[] = [
     {
       icon: <CalendarIcon className="h-4 w-4" />,
       label: "Experience",
-      value: "8+ Years"
+      value: getExperienceYears()
     },
     {
       icon: <MapPinIcon className="h-4 w-4" />,
       label: "Location",
-      value: "New York, NY"
+      value: "New York, NY" // This could be added to the database schema
     },
     {
       icon: <MailIcon className="h-4 w-4" />,
       label: "Email",
-      value: "jane.doe.design@email.com"
+      value: "jane.doe.design@email.com" // This could come from contact info
     }
   ];
 
@@ -92,7 +137,7 @@ export function Bio() {
           >
             <div className="relative w-64 h-64 lg:w-full lg:h-auto lg:aspect-square overflow-hidden rounded-2xl border-4 border-primary/10">
               <Image
-                src="/images/profile.jpg"
+                src={about.hero?.image || "/images/profile.jpg"}
                 alt="Profile Picture"
                 fill
                 className="object-cover"
@@ -113,30 +158,28 @@ export function Bio() {
             <div className="flex flex-col h-full justify-between">
               {/* Header */}
               <div className="mb-6">
-                <h1 className="text-4xl font-bold mb-2">Jane Doe</h1>
+                <h1 className="text-4xl font-bold mb-2">{about.hero?.headline || "Jane Doe"}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="default" className="text-sm gap-1"><Palette className="h-3 w-3"/> Graphic Designer</Badge>
-                  <Badge variant="secondary" className="text-sm gap-1"><Briefcase className="h-3 w-3"/> Branding Specialist</Badge>
-                  <Badge variant="outline" className="text-sm gap-1"><Sparkles className="h-3 w-3"/> UI/UX Enthusiast</Badge>
+                  {about.skills.slice(0, 3).map((skill, index) => (
+                    <Badge 
+                      key={index} 
+                      variant={index === 0 ? "default" : index === 1 ? "secondary" : "outline"} 
+                      className="text-sm gap-1"
+                    >
+                      {index === 0 && <Palette className="h-3 w-3"/>}
+                      {index === 1 && <Briefcase className="h-3 w-3"/>}
+                      {index === 2 && <Sparkles className="h-3 w-3"/>}
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
               </div>
 
               {/* Bio Text */}
               <div className="prose prose-lg dark:prose-invert mb-6 max-w-none">
-                <p>
-                  I&apos;m a passionate and creative Graphic Designer with over 8 years of experience 
-                  in crafting compelling visual identities, engaging digital experiences, and impactful print materials.
-                  I thrive on transforming complex ideas into elegant, user-centered designs.
-                </p>
-                <p>
-                  My expertise lies in branding, UI/UX design, and illustration. I believe that great 
-                  design is a blend of aesthetic appeal, strategic thinking, and seamless functionality. 
-                  I&apos;m dedicated to delivering visually stunning solutions that resonate with audiences and achieve business goals.
-                </p>
-                <p>
-                  Outside of design, I draw inspiration from modern art, photography, and exploring urban landscapes.
-                  I&apos;m always eager to collaborate on exciting projects and connect with fellow creatives.
-                </p>
+                {about.bio.split('\n\n').map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
 
               {/* Personal Details */}

@@ -4,6 +4,7 @@ import { AboutHero } from "@/components/sections/about/hero";
 import { Skills } from "@/components/sections/about/skills";
 import { ExperienceTimeline } from "@/components/sections/about/experience-timeline";
 import { DownloadCV } from "@/components/sections/about/download-cv";
+import { Bio } from "@/components/sections/about/bio";
 import { getAbout } from "@/lib/actions/about-actions";
 
 export const metadata: Metadata = {
@@ -13,6 +14,14 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const about = await getAbout();
+  
+  // Default skill description - we could add this to the database schema in the future
+  const skillsDescription = "Leveraging a blend of creative talent and technical proficiency to deliver outstanding visual solutions.";
+  
+  // Default experience section text
+  const experienceTitle = "My Journey";
+  const experienceSubtitle = "A timeline of my professional experience and education.";
+  
   return (
     <>
       <HeaderPage
@@ -20,9 +29,24 @@ export default async function AboutPage() {
         subtitle="My background, expertise, and professional journey"
       />
       <main className="flex-1">
-        <AboutHero hero={about?.hero} />
-        <Skills skills={about?.skills ?? []} />
-        <ExperienceTimeline experience={about?.experience ?? []} />
+        <AboutHero hero={about?.hero} bio={about?.bio} />
+        <Bio about={about} />
+        <Skills 
+          skills={about?.skills ?? []} 
+          description={skillsDescription}
+        />
+        <ExperienceTimeline
+          title={experienceTitle}
+          subtitle={experienceSubtitle}
+          experience={
+            (about?.experience ?? []).map(exp => ({
+              title: exp.role,
+              organization: exp.company,
+              description: exp.description ?? '',
+              date: exp.end ? `${exp.start} - ${exp.end}` : exp.start,
+            }))
+          }
+        />
         <DownloadCV />
       </main>
     </>

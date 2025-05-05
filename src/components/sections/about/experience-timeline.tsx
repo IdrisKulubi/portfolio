@@ -84,14 +84,22 @@ function TimelineCard({ title, organization, description, date, icon: Icon = Bri
   );
 }
 
-export function ExperienceTimeline({ experience }: { experience: TimelineItem[] }) {
+export function ExperienceTimeline({ 
+  experience,
+  title = "My Journey",
+  subtitle = "A timeline of my professional experience and education in graphic design."
+}: { 
+  experience: TimelineItem[];
+  title?: string;
+  subtitle?: string;
+}) {
   if (!experience.length) return null;
   return (
     <Section className="py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
         <SectionHeading 
-          title="My Journey"
-          subtitle="A timeline of my professional experience and education in graphic design."
+          title={title}
+          subtitle={subtitle}
           align="center"
         />
         <div className="relative flex flex-col items-center">

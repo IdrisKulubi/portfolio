@@ -5,7 +5,13 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Section } from "@/components/ui/section";
 
-export function Skills({ skills }: { skills: string[] }) {
+export function Skills({ 
+  skills, 
+  description = "Leveraging a blend of creative talent and technical proficiency to deliver outstanding visual solutions." 
+}: { 
+  skills: string[]; 
+  description?: string;
+}) {
   const [activeTab, setActiveTab] = useState("all");
   const filteredSkills = skills;
   const categories = [
@@ -48,7 +54,7 @@ export function Skills({ skills }: { skills: string[] }) {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-muted-foreground max-w-2xl"
           >
-            Leveraging a blend of creative talent and technical proficiency to deliver outstanding visual solutions.
+            {description}
           </motion.p>
         </div>
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>

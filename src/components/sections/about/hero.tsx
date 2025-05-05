@@ -10,7 +10,21 @@ export interface HeroData {
   image?: string;
 }
 
-export function AboutHero({ hero }: { hero?: HeroData | null }) {
+export function AboutHero({ hero, bio }: { hero?: HeroData | null; bio?: string }) {
+  // If there's no bio text provided, return null or a placeholder
+  if (!bio) {
+    return (
+      <Section className="py-16">
+        <div className="container text-center text-muted-foreground">
+          About information is not available.
+        </div>
+      </Section>
+    );
+  }
+
+  // Split the bio into paragraphs for display
+  const paragraphs = bio.split('\n\n');
+
   return (
     <Section className="py-16">
       <div className="container">
@@ -26,20 +40,9 @@ export function AboutHero({ hero }: { hero?: HeroData | null }) {
               <p className="text-xl mb-2 text-muted-foreground">{hero.subheadline}</p>
             )}
             <div className="space-y-4 text-muted-foreground text-lg">
-              <p>
-                A creative graphic designer with a passion for visual storytelling 
-                and crafting unique brand identities. My goal is to translate ideas into 
-                impactful designs that connect and inspire.
-              </p>
-              <p>
-                With a keen eye for detail and a love for typography and color theory, 
-                I specialize in creating beautiful and effective solutions for print and digital media. 
-                From logos and branding systems to websites and illustrations, I approach each project with 
-                enthusiasm and strategic thinking.
-              </p>
-              <p>
-                Let&apos;s collaborate to bring your vision to life!
-              </p>
+              {paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
           </motion.div>
 

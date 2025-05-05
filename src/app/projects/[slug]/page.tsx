@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, getRelatedProjects } from "@/lib/projects";
+import { getProjectBySlug, getRelatedProjects } from "@/lib/actions/project-actions";
 import { ProjectDetail } from "@/components/sections/projects/project-detail";
 import { RelatedProjects } from "@/components/sections/projects/related-projects";
 

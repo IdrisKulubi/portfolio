@@ -2,7 +2,7 @@
 
 import db from '@/db/drizzle';
 import { projects } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 import { Project, ProjectCategory } from '@/types/project';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -57,4 +57,58 @@ export async function updateProject(id: string, data: Partial<Omit<Project, 'id'
 // Delete a project
 export async function deleteProject(id: string): Promise<void> {
   await db.delete(projects).where(eq(projects.id, id));
+}
+
+// Get a project by slug
+export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  const [row] = await db.select().from(projects).where(eq(projects.slug, slug));
+  return row ? mapRowToProject(row) : null;
+}
+
+// Get related projects based on category and exclude current project
+export async function getRelatedProjects(currentSlug: string, limit = 3): Promise<Project[]> {
+  const currentProject = await getProjectBySlug(currentSlug);
+  
+  if (!currentProject) return [];
+  
+  // First try to find projects with the same category
+  const rows = await db.select()
+    .from(projects)
+    .where(
+      and(
+        eq(projects.category, currentProject.category),
+        ne(projects.slug, currentSlug)
+      )
+    )
+    .limit(limit);
+  
+  let relatedProjects = rows.map(mapRowToProject);
+  
+  // If not enough related projects by category, add some other projects
+  if (relatedProjects.length < limit) {
+    const remainingLimit = limit - relatedProjects.length;
+    const otherRows = await db.select()
+      .from(projects)
+      .where(
+        and(
+          ne(projects.category, currentProject.category),
+          ne(projects.slug, currentSlug)
+        )
+      )
+      .limit(remainingLimit);
+    
+    relatedProjects = [...relatedProjects, ...otherRows.map(mapRowToProject)];
+  }
+  
+  return relatedProjects;
+}
+
+// Get featured projects
+export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
+  const rows = await db.select()
+    .from(projects)
+    .where(eq(projects.featured, true))
+    .limit(limit);
+  
+  return rows.map(mapRowToProject);
 } 

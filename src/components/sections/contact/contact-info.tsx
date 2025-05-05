@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Section } from "@/components/ui/section";
 import { Mail, Phone, MapPin, Linkedin, Instagram, Twitter, LucideIcon, PenTool, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 interface ContactData {
@@ -22,8 +22,48 @@ type ContactDetail = {
   color: string;
 };
 
-export function ContactInfo({ contact }: { contact: ContactData }) {
+// Helper function to generate deterministic "random" values based on seed
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+export function ContactInfo({ contact }: { contact?: ContactData | null }) {
   const id = useId();
+  const decorCount = 10;
+  
+  // Use a deterministic approach for the decorative elements
+  const decorElements = useMemo(() => {
+    return Array.from({ length: decorCount }).map((_, index) => {
+      // Use index as seed to generate stable values
+      const seed1 = index * 1.1;
+      const seed2 = index * 2.2;
+      const seed3 = index * 3.3;
+      const seed4 = index * 4.4;
+      const seed5 = index * 5.5;
+      const seed6 = index * 6.6;
+      
+      return {
+        width: seededRandom(seed1) * 300 + 100,
+        height: seededRandom(seed2) * 300 + 100,
+        top: seededRandom(seed3) * 100,
+        left: seededRandom(seed4) * 100,
+        x: seededRandom(seed5) * 50 - 25,
+        y: seededRandom(seed6) * 50 - 25,
+        duration: seededRandom(index) * 10 + 10,
+      };
+    });
+  }, []);
+
+  if (!contact) {
+    return (
+      <Section className="py-20">
+        <div className="container text-center text-muted-foreground">
+          Contact information is not available.
+        </div>
+      </Section>
+    );
+  }
 
   const contactDetails: ContactDetail[] = [
     contact.email
@@ -112,15 +152,11 @@ export function ContactInfo({ contact }: { contact: ContactData }) {
     }
   };
 
-  // Decorative elements count
-  const decorCount = 10;
-  const decorElements = Array.from({ length: decorCount });
-
   return (
     <Section className="py-20 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden opacity-40">
-        {decorElements.map((_, index) => (
+        {decorElements.map((decor, index) => (
           <motion.div
             key={`${id}-decor-${index}`}
             className={cn(
@@ -130,20 +166,21 @@ export function ContactInfo({ contact }: { contact: ContactData }) {
               "bg-accent"
             )}
             style={{
-              width: `${Math.random() * 300 + 100}px`,
-              height: `${Math.random() * 300 + 100}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              width: decor.width,
+              height: decor.height,
+              top: `${decor.top}%`,
+              left: `${decor.left}%`,
               filter: "blur(60px)"
             }}
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 0 }}
             animate={{ 
               opacity: [0.1, 0.3, 0.1],
-              x: [0, Math.random() * 50 - 25],
-              y: [0, Math.random() * 50 - 25]
+              x: [0, decor.x],
+              y: [0, decor.y],
+              scale: 1
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: decor.duration,
               repeat: Infinity,
               repeatType: "reverse",
             }}
