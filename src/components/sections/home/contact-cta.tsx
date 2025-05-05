@@ -97,7 +97,7 @@ export function ContactCta({ contact }: { contact?: ContactData | null }) {
               Ready to Start Your Project?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Let's work together to create something extraordinary. Get in touch to discuss your ideas and requirements.
+              Let&apos;s work together to create something extraordinary. Get in touch to discuss your ideas and requirements.
             </p>
           </motion.div>
           

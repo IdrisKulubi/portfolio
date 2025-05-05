@@ -9,7 +9,6 @@ import {
   PenTool, 
   Layout, 
   Globe, 
-  Image, 
   Type, 
   LucideIcon,
   PackageIcon
