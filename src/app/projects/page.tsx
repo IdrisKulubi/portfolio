@@ -1,7 +1,7 @@
 import { Metadata } from "next";
-import { Suspense } from 'react';
 import { HeaderPage } from "@/components/layout/header-page";
 import { ProjectsGallery } from "@/components/sections/projects/projects-gallery";
+import { getProjects } from "@/lib/actions/project-actions";
 
 export const metadata: Metadata = {
   title: "Portfolio - Creative Work",
@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
+  const projects = await getProjects();
   return (
     <>
       <HeaderPage
@@ -17,9 +18,7 @@ export default async function ProjectsPage() {
         color="secondary"
       />
       <main className="flex-1 py-12">
-        <Suspense fallback={<div>Loading projects...</div>}>
-          <ProjectsGallery />
-        </Suspense>
+        <ProjectsGallery projects={projects} />
       </main>
     </>
   );

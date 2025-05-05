@@ -22,8 +22,8 @@ export interface Project {
   tags: string[];
   thumbnail: ProjectImage;
   images: ProjectImage[];
-  client: string;
-  year: number;
+  client: string | null;
+  year: number | null;
   description: string;
   challenge?: string;
   solution?: string;

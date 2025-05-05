@@ -4,7 +4,7 @@ import { AnimatedSection } from "@/components/ui/animated-section";
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { cn } from "@/lib/utils";
-import {  Briefcase, GraduationCap, Palette, LucideIcon } from "lucide-react";
+import { Briefcase, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TimelineItem {
@@ -12,61 +12,13 @@ interface TimelineItem {
   organization: string;
   description: string;
   date: string;
-  icon: LucideIcon;
-  type: 'work' | 'education';
+  icon?: LucideIcon;
+  type?: 'work' | 'education';
 }
 
-const timelineItems: TimelineItem[] = [
-  {
-    title: "Senior Graphic Designer",
-    organization: "Creative Studio Elevate",
-    description: "Led branding initiatives and campaign designs for key clients. Mentored junior designers and managed project timelines.",
-    date: "2021 - Present",
-    icon: Palette,
-    type: 'work',
-  },
-  {
-    title: "Graphic & Web Designer",
-    organization: "Digital Bloom Agency",
-    description: "Designed and developed visually engaging websites and marketing collateral. Focused on UI/UX improvements and brand consistency.",
-    date: "2018 - 2021",
-    icon: Briefcase,
-    type: 'work',
-  },
-  {
-    title: "Bachelor of Fine Arts in Graphic Design",
-    organization: "Pratt Institute",
-    description: "Graduated with honors. Specialized in visual communication and digital media.",
-    date: "2014 - 2018",
-    icon: GraduationCap,
-    type: 'education',
-  },
-  {
-    title: "Freelance Designer",
-    organization: "Self-Employed",
-    description: "Worked with various small businesses on branding, logo design, and social media graphics.",
-    date: "2016 - 2018",
-    icon: Briefcase,
-    type: 'work',
-  },
-  {
-    title: "Internship",
-    organization: "DesignHub Collective",
-    description: "Assisted senior designers with project research, mood boards, and production tasks.",
-    date: "Summer 2017",
-    icon: Palette,
-    type: 'work',
-  },
-];
-
-interface TimelineItemProps extends TimelineItem {
-  index: number;
-}
-
-function TimelineCard({ title, organization, description, date, icon: Icon, type, index }: TimelineItemProps) {
+function TimelineCard({ title, organization, description, date, icon: Icon = Briefcase, type = 'work', index }: TimelineItem & { index: number }) {
   const isEven = index % 2 === 0;
   const isWork = type === 'work';
-  
   return (
     <div className={cn(
       "relative flex w-full",
@@ -76,10 +28,8 @@ function TimelineCard({ title, organization, description, date, icon: Icon, type
     )}>
       {/* Desktop timeline line */}
       <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 z-0" />
-      
       {/* Mobile timeline line */}
       <div className="md:hidden absolute left-6 top-0 bottom-0 w-px bg-border z-0" />
-      
       {/* Timeline dot */}
       <motion.div 
         className={cn(
@@ -95,7 +45,6 @@ function TimelineCard({ title, organization, description, date, icon: Icon, type
       >
         <Icon className={cn("w-2.5 h-2.5", isWork ? "text-primary" : "text-secondary")} />
       </motion.div>
-      
       <AnimatedSection 
         className="relative md:w-1/2"
         direction={isEven ? "right" : "left"}
@@ -118,7 +67,6 @@ function TimelineCard({ title, organization, description, date, icon: Icon, type
             isEven ? "md:-right-1.5 md:border-t-0 md:border-l-0 md:border-b md:border-r" : "md:-left-1.5 md:border-b-0 md:border-r-0 md:border-t md:border-l",
             "hidden md:block"
           )}></div>
-
           <div className="flex items-center mb-2">
             <span className={cn(
               "text-xs font-semibold px-2.5 py-1 rounded-full mr-3",
@@ -136,7 +84,8 @@ function TimelineCard({ title, organization, description, date, icon: Icon, type
   );
 }
 
-export function ExperienceTimeline() {
+export function ExperienceTimeline({ experience }: { experience: TimelineItem[] }) {
+  if (!experience.length) return null;
   return (
     <Section className="py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
@@ -148,8 +97,7 @@ export function ExperienceTimeline() {
         <div className="relative flex flex-col items-center">
           {/* Desktop central line - drawn once */}
           <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 z-0" />
-          
-          {timelineItems.map((item, index) => (
+          {experience.map((item, index) => (
             <TimelineCard key={index} {...item} index={index} />
           ))}
         </div>

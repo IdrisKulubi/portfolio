@@ -4,7 +4,13 @@ import { Section } from "@/components/ui/section";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-export function AboutHero() {
+export interface HeroData {
+  headline: string;
+  subheadline?: string;
+  image?: string;
+}
+
+export function AboutHero({ hero }: { hero?: HeroData | null }) {
   return (
     <Section className="py-16">
       <div className="container">
@@ -15,7 +21,10 @@ export function AboutHero() {
             transition={{ duration: 0.6 }}
             className="order-2 md:order-1"
           >
-            <h2 className="text-3xl font-bold mb-4 text-primary">Hello, I&apos;m Clement</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">{hero?.headline || "Hello, I'm Clement"}</h2>
+            {hero?.subheadline && (
+              <p className="text-xl mb-2 text-muted-foreground">{hero.subheadline}</p>
+            )}
             <div className="space-y-4 text-muted-foreground text-lg">
               <p>
                 A creative graphic designer with a passion for visual storytelling 
@@ -42,8 +51,8 @@ export function AboutHero() {
           >
             <div className="relative aspect-[4/5] max-w-sm mx-auto rounded-2xl overflow-hidden border-4 border-primary/10 shadow-xl">
               <Image
-                src="/images/graphic-designer-profile.jpg"
-                alt="Jane Doe - Graphic Designer"
+                src={hero?.image || "/images/graphic-designer-profile.jpg"}
+                alt={hero?.headline || "Jane Doe - Graphic Designer"}
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 768px) 90vw, 400px"

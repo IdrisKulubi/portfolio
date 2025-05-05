@@ -1,46 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project } from '@/types/project';
 import { ProjectCard } from '@/components/projects/project-card';
 import { ProjectFilter } from '@/components/projects/project-filter';
 import { PROJECT_CATEGORIES } from '@/types/project';
-import { getProjects } from '@/lib/projects';
 import { Section } from '@/components/ui/section';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
-export function ProjectsGallery() {
+export function ProjectsGallery({ projects }: { projects: Project[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   
   // Get the category from URL or default to 'all'
   const categoryParam = searchParams.get('category') || 'all';
-  
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
   const [activeCategory, setActiveCategory] = useState(categoryParam);
 
-  // Fetch projects when category changes
-  useEffect(() => {
-    async function loadProjects() {
-      setIsLoading(true);
-      try {
-        const data = await getProjects({ 
-          category: activeCategory === 'all' ? undefined : activeCategory 
-        });
-        setProjects(data);
-      } catch (error) {
-        console.error('Failed to load projects:', error);
-      } finally {
-        setIsLoading(false);
+  // Filter projects by category
+  const filteredProjects = activeCategory === 'all'
+    ? projects
+    : projects.filter(project => project.category === activeCategory);
+
+  // Animation variants for container
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
       }
     }
-    
-    loadProjects();
-  }, [activeCategory]);
+  };
 
   // Update URL when category changes
   const handleCategoryChange = (category: string) => {
@@ -58,17 +52,6 @@ export function ProjectsGallery() {
     
     // Update the URL
     router.push(`${pathname}?${params.toString()}`);
-  };
-
-  // Animation variants for container
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
   };
 
   return (
@@ -102,42 +85,30 @@ export function ProjectsGallery() {
 
         {/* Projects Grid */}
         <AnimatePresence mode="wait">
-          {isLoading ? (
-            <motion.div 
-              key="loader"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex justify-center py-20"
-            >
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key={activeCategory}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            >
-              {projects.length > 0 ? (
-                projects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="col-span-full text-center py-12"
-                >
-                  <p className="text-muted-foreground">
-                    No projects found in this category. Please try another filter.
-                  </p>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+          <motion.div
+            key={activeCategory}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {filteredProjects.length > 0 ? (
+              filteredProjects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} />
+              ))
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full text-center py-12"
+              >
+                <p className="text-muted-foreground">
+                  No projects found in this category. Please try another filter.
+                </p>
+              </motion.div>
+            )}
+          </motion.div>
         </AnimatePresence>
       </div>
     </Section>

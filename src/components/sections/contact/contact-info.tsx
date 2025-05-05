@@ -7,67 +7,72 @@ import { Button } from "@/components/ui/button";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 
-interface ContactDetail {
+interface ContactData {
+  email: string;
+  phone?: string | null;
+  socials?: Array<{ type: string; url: string }> | null;
+  address?: string | null;
+}
+
+type ContactDetail = {
   icon: LucideIcon;
   label: string;
   value: string;
   href?: string;
   color: string;
-}
+};
 
-interface SocialLink {
-  icon: LucideIcon;
-  href: string;
-  label: string;
-  color: string;
-}
-
-export function ContactInfo() {
+export function ContactInfo({ contact }: { contact: ContactData }) {
   const id = useId();
-  
-  const contactDetails: ContactDetail[] = [
-    {
-      icon: Mail,
-      label: "Email",
-      value: "clement.design@email.com",
-      href: "mailto:clement.design@email.com",
-      color: "from-blue-500/20 to-blue-500/10 text-blue-500"
-    },
-    {
-      icon: Phone,
-      label: "Phone",
-      value: "0712344567",
-      href: "tel:0712344567",
-      color: "from-emerald-500/20 to-emerald-500/10 text-emerald-500"
-    },
-    {
-      icon: MapPin,
-      label: "Location",
-      value: "Nairobi, Kenya (Remote Available)",
-      color: "from-amber-500/20 to-amber-500/10 text-amber-500"
-    },
-  ];
 
-  const socialLinks: SocialLink[] = [
-    {
-      icon: Linkedin,
-      href: "https://linkedin.com/in/graphicdesignerprofile",
-      label: "LinkedIn",
-      color: "bg-blue-600 text-white hover:bg-blue-700"
-    },
-    {
-      icon: Instagram,
-      href: "https://instagram.com/clement_design",
-      label: "Instagram",
-      color: "bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 text-white hover:from-pink-600 hover:via-purple-600 hover:to-orange-500"
-    },
-    {
-      icon: Twitter, 
-      href: "https://twitter.com/clement_design", 
-      label: "Twitter",
-      color: "bg-sky-500 text-white hover:bg-sky-600"
-    }
-  ];
+  const contactDetails: ContactDetail[] = [
+    contact.email
+      ? {
+          icon: Mail,
+          label: "Email",
+          value: contact.email,
+          href: `mailto:${contact.email}`,
+          color: "from-blue-500/20 to-blue-500/10 text-blue-500",
+        }
+      : undefined,
+    contact.phone
+      ? {
+          icon: Phone,
+          label: "Phone",
+          value: contact.phone,
+          href: `tel:${contact.phone}`,
+          color: "from-emerald-500/20 to-emerald-500/10 text-emerald-500",
+        }
+      : undefined,
+    contact.address
+      ? {
+          icon: MapPin,
+          label: "Location",
+          value: contact.address,
+          color: "from-amber-500/20 to-amber-500/10 text-amber-500",
+        }
+      : undefined,
+  ].filter((d): d is ContactDetail => !!d);
+
+  const socialIconMap: Record<string, LucideIcon> = {
+    linkedin: Linkedin,
+    instagram: Instagram,
+    twitter: Twitter,
+  };
+
+  const socialLinks = (contact.socials || []).map(social => ({
+    icon: socialIconMap[social.type.toLowerCase()] || Linkedin,
+    href: social.url,
+    label: social.type.charAt(0).toUpperCase() + social.type.slice(1),
+    color:
+      social.type.toLowerCase() === "linkedin"
+        ? "bg-blue-600 text-white hover:bg-blue-700"
+        : social.type.toLowerCase() === "instagram"
+        ? "bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 text-white hover:from-pink-600 hover:via-purple-600 hover:to-orange-500"
+        : social.type.toLowerCase() === "twitter"
+        ? "bg-sky-500 text-white hover:bg-sky-600"
+        : "bg-muted text-foreground",
+  }));
 
   // Animation variants
   const fadeInUp = {
