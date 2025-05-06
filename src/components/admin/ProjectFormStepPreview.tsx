@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import type { Omit } from 'utility-types';
-import type { Project } from '@/types/project';
+import { Project } from '@/types/project';
 
 interface ProjectFormStepPreviewProps {
   values: Omit<Project, 'id' | 'createdAt'>;
