@@ -8,6 +8,7 @@ import { ProjectFilter } from '@/components/projects/project-filter';
 import { PROJECT_CATEGORIES } from '@/types/project';
 import { Section } from '@/components/ui/section';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export function ProjectsGallery({ projects }: { projects: Project[] }) {
   const searchParams = useSearchParams();
