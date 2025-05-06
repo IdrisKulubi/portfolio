@@ -37,7 +37,7 @@ This is a modern portfolio website built with the latest web technologies, featu
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/IdrisKulubi/portfolio
     cd portfolio
     ```
 
@@ -62,7 +62,6 @@ This is a modern portfolio website built with the latest web technologies, featu
         UPLOADTHING_SECRET="your_uploadthing_secret"
         UPLOADTHING_APP_ID="your_uploadthing_app_id"
 
-        # Add any other required variables (e.g., authentication secrets if added later)
         ```
     *   Replace the placeholder values with your actual credentials.
 
