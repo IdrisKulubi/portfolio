@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { UploadButton } from '@/utils/uploadthing';
+import Image from 'next/image';
 
 interface ExperienceItem {
   company: string;
@@ -114,8 +116,22 @@ export function AdminAboutForm() {
           <Input value={subheadline} onChange={e => setSubheadline(e.target.value)} />
         </div>
         <div>
-          <label className="block font-medium mb-1">Image URL</label>
-          <Input value={image} onChange={e => setImage(e.target.value)} />
+          <label className="block font-medium mb-1">Hero Image</label>
+          <div className="flex flex-col gap-2">
+            {image && <Image src={image} alt="Hero Image Preview" width={100} height={100} className="rounded border" />}
+            <UploadButton
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                if (res && res[0]) {
+                  setImage(res[0].url);
+                  toast.success('Image uploaded!');
+                }
+              }}
+              onUploadError={(error) => {
+                toast.error(`Upload failed: ${error.message}`);
+              }}
+            />
+          </div>
         </div>
       </div>
       <div>

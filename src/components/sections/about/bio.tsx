@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, Palette, Sparkles } from 'lucide-react';
 import { Section } from "@/components/ui/section";
+import { getContact } from "@/lib/actions/contact-actions";
+import { useEffect, useState } from "react";
 
 interface SocialLink {
   platform: string;
@@ -18,6 +20,16 @@ interface PersonalDetail {
   icon: React.ReactNode;
   label: string;
   value: string;
+}
+
+interface ContactInfo {
+  id: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+  socials?: Array<{ type: string; url: string }> | null;
+  createdAt: Date;
+  resume?: string | null;
 }
 
 interface BioProps {
@@ -59,6 +71,17 @@ const BehanceIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export function Bio({ about }: BioProps) {
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      const contact = await getContact();
+      setContactInfo(contact);
+    };
+
+    fetchContactInfo();
+  }, []);
+
   if (!about) {
     return (
       <Section className="py-16">
@@ -85,8 +108,26 @@ export function Bio({ about }: BioProps) {
     return `${yearsOfExperience}+ Years`;
   };
   
-  // Hardcoded social links could be moved to the database schema in the future
-  const socialLinks: SocialLink[] = [
+  // Get social links from contact info if available, otherwise use fallbacks
+  const getSocialIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'linkedin':
+        return <LinkedinIcon className="h-5 w-5" />;
+      case 'behance':
+        return <BehanceIcon className="h-5 w-5" />;
+      case 'dribbble':
+        return <DribbbleIcon className="h-5 w-5" />;
+      default:
+        return <LinkedinIcon className="h-5 w-5" />;
+    }
+  };
+
+  // Use socials from contact info if available
+  const socialLinks: SocialLink[] = contactInfo?.socials?.map(social => ({
+    platform: social.type,
+    url: social.url,
+    icon: getSocialIcon(social.type)
+  })) || [
     {
       platform: "LinkedIn",
       url: "https://linkedin.com/in/graphicdesignerprofile",
@@ -114,12 +155,12 @@ export function Bio({ about }: BioProps) {
     {
       icon: <MapPinIcon className="h-4 w-4" />,
       label: "Location",
-      value: "New York, NY" // This could be added to the database schema
+      value: contactInfo?.address || "New York, NY"
     },
     {
       icon: <MailIcon className="h-4 w-4" />,
       label: "Email",
-      value: "jane.doe.design@email.com" // This could come from contact info
+      value: contactInfo?.email || "jane.doe.design@email.com"
     }
   ];
 
@@ -158,7 +199,7 @@ export function Bio({ about }: BioProps) {
             <div className="flex flex-col h-full justify-between">
               {/* Header */}
               <div className="mb-6">
-                <h1 className="text-4xl font-bold mb-2">{about.hero?.headline || "Jane Doe"}</h1>
+                <h1 className="text-4xl font-bold mb-2">{about.hero?.headline || "Clement"}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {about.skills.slice(0, 3).map((skill, index) => (
                     <Badge 
@@ -213,11 +254,13 @@ export function Bio({ about }: BioProps) {
                     </a>
                   </Button>
                 ))}
-                <Button className="gap-2">
-                  <a href="/jane_doe_resume.pdf" download="Jane_Doe_CV.pdf">
-                    Download CV
-                  </a>
-                </Button>
+                {contactInfo?.resume && (
+                  <Button className="gap-2">
+                    <a href={contactInfo.resume} download>
+                      Download CV
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>

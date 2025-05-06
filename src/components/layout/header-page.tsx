@@ -10,6 +10,12 @@ interface HeaderPageProps {
   color?: 'default' | 'primary' | 'secondary' | 'accent';
 }
 
+// Helper function to generate deterministic "random" values based on seed
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 export function HeaderPage({ 
   title, 
   subtitle,
@@ -27,7 +33,21 @@ export function HeaderPage({
 
   // Animated dots decoration
   const dotCount = 30;
-  const dots = Array.from({ length: dotCount });
+  const dots = Array.from({ length: dotCount }).map((_, index) => {
+    const seed1 = index * 1.1;
+    const seed2 = index * 2.2;
+    const seed3 = index * 3.3;
+    const seed4 = index * 4.4;
+    
+    return {
+      width: seededRandom(seed1) * 8 + 4,
+      height: seededRandom(seed1) * 8 + 4, // Use same seed for width/height to keep them equal
+      left: seededRandom(seed3) * 100,
+      top: seededRandom(seed4) * 100,
+      yOffset: seededRandom(seed2) * 20 - 10,
+      xOffset: seededRandom(seed2 + 100) * 20 - 10,
+    };
+  });
 
   return (
     <section className={cn(
@@ -37,7 +57,7 @@ export function HeaderPage({
     )}>
       {/* Animated background dots */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
-        {dots.map((_, index) => (
+        {dots.map((dot, index) => (
           <motion.div
             key={`${id}-dot-${index}`}
             className={cn(
@@ -48,17 +68,17 @@ export function HeaderPage({
               "bg-accent"
             )}
             style={{ 
-              width: `${Math.random() * 8 + 4}px`, 
-              height: `${Math.random() * 8 + 4}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: `${dot.width}px`, 
+              height: `${dot.height}px`,
+              left: `${dot.left}%`,
+              top: `${dot.top}%`,
             }}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ 
               opacity: 0.6, 
               scale: 1,
-              y: [0, Math.random() * 20 - 10],
-              x: [0, Math.random() * 20 - 10],
+              y: [0, dot.yOffset],
+              x: [0, dot.xOffset],
             }}
             transition={{
               duration: 3,

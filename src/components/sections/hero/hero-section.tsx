@@ -56,9 +56,11 @@ export function HeroSection() {
               className="bg-white text-black hover:bg-gray-200 dark:bg-white dark:text-black dark:hover:bg-gray-200"
               onClick={scrollToProjects}
             >
+              <Link href="/projects">
               View Portfolio
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 dark:border-white dark:text-white dark:hover:bg-white/10" asChild>
+            <Button size="lg" variant="outline" className="border-white text-black  dark:border-white dark:text-white " asChild>
               <Link href="/contact">
                 Contact Me
               </Link>

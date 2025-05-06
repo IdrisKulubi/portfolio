@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { HeaderPage } from "@/components/layout/header-page";
-import { AboutHero } from "@/components/sections/about/hero";
 import { Skills } from "@/components/sections/about/skills";
 import { ExperienceTimeline } from "@/components/sections/about/experience-timeline";
 import { DownloadCV } from "@/components/sections/about/download-cv";
@@ -29,7 +28,6 @@ export default async function AboutPage() {
         subtitle="My background, expertise, and professional journey"
       />
       <main className="flex-1">
-        <AboutHero hero={about?.hero} bio={about?.bio} />
         <Bio about={about} />
         <Skills 
           skills={about?.skills ?? []} 
