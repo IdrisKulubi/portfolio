@@ -5,6 +5,7 @@ import { projects } from '@/db/schema';
 import { eq, and, ne } from 'drizzle-orm';
 import { Project, ProjectCategory } from '@/types/project';
 import { v4 as uuidv4 } from 'uuid';
+import { revalidatePath } from 'next/cache';
 
 // Helper to map DB row to Project type
 function mapRowToProject(row: typeof projects.$inferSelect): Project {
@@ -19,6 +20,14 @@ function mapRowToProject(row: typeof projects.$inferSelect): Project {
     thumbnail: typeof row.thumbnail === 'string' ? JSON.parse(row.thumbnail) : row.thumbnail,
     images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
   };
+}
+
+// Helper to revalidate all project-related pages
+export async function revalidateProjectPages() {
+  revalidatePath('/projects');
+  revalidatePath('/projects/[slug]');
+  revalidatePath('/');
+  revalidatePath('/admin');
 }
 
 // Get all projects
@@ -41,6 +50,10 @@ export async function createProject(data: Omit<Project, 'id' | 'createdAt'>): Pr
     .insert(projects)
     .values({ ...data, id, createdAt })
     .returning();
+    
+  // Revalidate project pages
+  await revalidateProjectPages();
+  
   return mapRowToProject(row);
 }
 
@@ -51,12 +64,19 @@ export async function updateProject(id: string, data: Partial<Omit<Project, 'id'
     .set({ ...data })
     .where(eq(projects.id, id))
     .returning();
+    
+  // Revalidate project pages
+  await revalidateProjectPages();
+  
   return row ? mapRowToProject(row) : undefined;
 }
 
 // Delete a project
 export async function deleteProject(id: string): Promise<void> {
   await db.delete(projects).where(eq(projects.id, id));
+  
+  // Revalidate project pages
+  await revalidateProjectPages();
 }
 
 // Get a project by slug
