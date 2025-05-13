@@ -92,6 +92,15 @@ export function Bio({ about }: BioProps) {
     );
   }
 
+  // Debug: log about.hero to verify its value
+  console.log("about.hero", about.hero);
+
+  // Improved image fallback logic
+  const profileImage =
+    about.hero && typeof about.hero.image === "string" && about.hero.image.trim() !== ""
+      ? about.hero.image
+      : "/images/profile.jpg";
+
   // Extract years of experience from the earliest experience entry
   const getExperienceYears = () => {
     if (!about.experience || about.experience.length === 0) return "N/A";
@@ -178,7 +187,7 @@ export function Bio({ about }: BioProps) {
           >
             <div className="relative w-64 h-64 lg:w-full lg:h-auto lg:aspect-square overflow-hidden rounded-2xl border-4 border-primary/10">
               <Image
-                src={about.hero?.image || "/images/profile.jpg"}
+                src={profileImage}
                 alt="Profile Picture"
                 fill
                 className="object-cover"
