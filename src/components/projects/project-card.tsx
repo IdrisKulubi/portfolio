@@ -96,7 +96,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                   src={project.thumbnail.src}
                   alt={project.thumbnail.alt}
                   fill
-                  className="object-cover"
+                  className="object-contain bg-muted/20"
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </motion.div>

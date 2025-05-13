@@ -190,7 +190,7 @@ export function Bio({ about }: BioProps) {
                 src={profileImage}
                 alt="Profile Picture"
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 16rem, 33vw"
                 priority
               />
