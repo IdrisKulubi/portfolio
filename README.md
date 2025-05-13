@@ -1,6 +1,6 @@
 # Modern Portfolio Website & Admin Dashboard
 
-This is a modern portfolio website built with the latest web technologies, featuring a dynamic frontend to showcase projects and skills, and a secure admin dashboard for easy content management.
+This is a modern portfolio website built with the latest web technologies, featuring a dynamic frontend to showcase projects and skills, and a secure admin dashboard for easy content management. All custom not hardcoded data
 
 ## ✨ Features
 
