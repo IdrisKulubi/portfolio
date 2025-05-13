@@ -8,6 +8,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { UploadButton } from '@/utils/uploadthing';
 import Image from 'next/image';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from 'lucide-react';
 
 interface ExperienceItem {
   company: string;
@@ -28,6 +40,7 @@ export function AdminAboutForm() {
   const [isPending, startTransition] = useTransition();
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   useEffect(() => {
     getAbout().then(data => {
@@ -57,6 +70,42 @@ export function AdminAboutForm() {
   };
   const handleExpRemove = (idx: number) => {
     setExperience(exp => exp.filter((_, i) => i !== idx));
+  };
+
+  // Handle image deletion with confirmation
+  const handleImageDelete = () => {
+    setImage('');
+    setConfirmDialogOpen(false);
+    
+    // Save the changes immediately after deletion
+    if (about?.id) {
+      startTransition(async () => {
+        try {
+          // Update DB with empty image
+          const payload: AboutData = {
+            bio,
+            skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+            hero: { headline, subheadline, image: '' },
+            experience: experience.filter(e => e.company && e.role && e.start),
+          };
+          
+          const result = await updateAbout(about.id, payload);
+          setAbout(
+            result
+              ? {
+                  ...result,
+                  experience: result.experience ?? [],
+                  hero: result.hero ?? undefined,
+                }
+              : null
+          );
+          toast.success('Image deleted successfully');
+        } catch (err) {
+          console.error(err);
+          toast.error('Failed to delete image');
+        }
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -117,20 +166,122 @@ export function AdminAboutForm() {
         </div>
         <div>
           <label className="block font-medium mb-1">Hero Image</label>
-          <div className="flex flex-col gap-2">
-            {image && <Image src={image} alt="Hero Image Preview" width={100} height={100} className="rounded border" />}
-            <UploadButton
-              endpoint="imageUploader"
-              onClientUploadComplete={(res) => {
-                if (res && res[0]) {
-                  setImage(res[0].url);
-                  toast.success('Image uploaded!');
-                }
-              }}
-              onUploadError={(error) => {
-                toast.error(`Upload failed: ${error.message}`);
-              }}
-            />
+          <div className="flex flex-col gap-3">
+            {image ? (
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="w-full h-48 bg-muted/40 rounded-md border overflow-hidden relative">
+                    <Image 
+                      src={image} 
+                      alt="Hero Image Preview" 
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  
+                  <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                        title="Remove image"
+                        aria-label="Remove image"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this image? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleImageDelete}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-2">
+                  <div>
+                    <label className="text-xs text-muted-foreground">Image URL</label>
+                    <Input 
+                      value={image} 
+                      onChange={(e) => setImage(e.target.value)}
+                      className="text-sm" 
+                      placeholder="Image URL"
+                    />
+                  </div>
+                  <div className="flex justify-between">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setImage("")}
+                    >
+                      Replace
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      variant="secondary" 
+                      size="sm"
+                    >
+                      Save Changes
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <UploadButton
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]) {
+                      setImage(res[0].url);
+                      toast.success('Image uploaded!');
+                      
+                      // Auto-save the image after upload if we have an existing record
+                      if (about?.id) {
+                        startTransition(async () => {
+                          try {
+                            const payload: AboutData = {
+                              bio,
+                              skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+                              hero: { headline, subheadline, image: res[0].url },
+                              experience: experience.filter(e => e.company && e.role && e.start),
+                            };
+                            
+                            const result = await updateAbout(about.id, payload);
+                            if (result) {
+                              setAbout({
+                                ...result,
+                                experience: result.experience ?? [],
+                                hero: result.hero ?? undefined,
+                              });
+                              toast.success('Image saved to database!');
+                            }
+                          } catch (err) {
+                            console.error(err);
+                            toast.error('Failed to save image to database');
+                          }
+                        });
+                      }
+                    }
+                  }}
+                  onUploadError={(error) => {
+                    toast.error(`Upload failed: ${error.message}`);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Upload your profile/hero image. Recommended size: 800x800 pixels. Images will be displayed using object-contain to ensure they fit properly.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
