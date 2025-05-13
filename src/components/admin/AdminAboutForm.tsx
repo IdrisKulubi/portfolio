@@ -89,6 +89,10 @@ export function AdminAboutForm() {
             experience: experience.filter(e => e.company && e.role && e.start),
           };
           
+          if (!about.id) {
+            throw new Error('About ID is required');
+          }
+
           const result = await updateAbout(about.id, payload);
           setAbout(
             result
@@ -255,7 +259,11 @@ export function AdminAboutForm() {
                               hero: { headline, subheadline, image: res[0].url },
                               experience: experience.filter(e => e.company && e.role && e.start),
                             };
-                            
+
+                            if (!about.id) {
+                              throw new Error('About ID is required');
+                            }
+
                             const result = await updateAbout(about.id, payload);
                             if (result) {
                               setAbout({
