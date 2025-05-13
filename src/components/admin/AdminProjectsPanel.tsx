@@ -66,6 +66,9 @@ export function AdminProjectsPanel() {
         await deleteProject(deleteId);
         setProjects((prev) => prev.filter((p) => p.id !== deleteId));
         toast.success("Project deleted");
+        
+        // Force a refresh to ensure stale data is cleared
+        window.location.reload();
       } catch (err) {
         console.error(err);
         toast.error("Failed to delete project");
